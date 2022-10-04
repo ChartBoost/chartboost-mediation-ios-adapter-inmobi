@@ -1,8 +1,8 @@
 Pod::Spec.new do |spec|
   spec.name        = 'ChartboostHeliumAdapterInMobi'
-  spec.version     = '4.10.0.0.0'
+  spec.version     = '4.10.0.2.0'
   spec.license     = { :type => 'MIT', :file => 'LICENSE.md' }
-  spec.homepage    = 'https://github.com/ChartBoost/helium-ios-adapter-chartboost'
+  spec.homepage    = 'https://github.com/ChartBoost/helium-ios-adapter-inmobi'
   spec.authors     = { 'Chartboost' => 'https://www.chartboost.com/' }
   spec.summary     = 'Helium iOS SDK InMobi adapter.'
   spec.description = 'InMobi Adapters for mediating through Helium. Supported ad formats: Banner, Interstitial, and Rewarded.'
@@ -23,5 +23,8 @@ Pod::Spec.new do |spec|
   spec.dependency 'ChartboostHelium', '~> 4.0'
 
   # Partner network SDK and version that this adapter is certified to work with.
-  spec.dependency 'InMobiSDK', '10.0' 
+  spec.dependency 'InMobiSDK', '10.0.2'
+  
+  # The partner network SDK is a static framework which requires the static_framework option.
+  spec.static_framework = true
 end
