@@ -57,11 +57,12 @@ final class InMobiBannerAdAdapter: NSObject, PartnerAdAdapter {
             
             // Create the banner
             let frame = CGRect(origin: .zero, size: self.request.size ?? IABStandardAdSize)
-            self.ad = IMBanner(frame: frame, placementId: self.placementID, delegate: self)
-            self.ad?.shouldAutoRefresh(false)
+            let banner = IMBanner(frame: frame, placementId: self.placementID, delegate: self)
+            banner?.shouldAutoRefresh(false)
+            self.ad = banner
             
             // Load it
-            self.ad?.load()
+            banner?.load()
         }
     }
     
