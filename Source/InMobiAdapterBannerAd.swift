@@ -1,5 +1,5 @@
 //
-//  InMobiBannerAdAdapter.swift
+//  InMobiAdapterBannerAd.swift
 //  HeliumAdapterInMobi
 //
 //  Created by Daniel Barros on 10/4/22.
@@ -9,17 +9,12 @@ import Foundation
 import HeliumSdk
 import InMobiSDK
 
-/// The Helium InMobi ad adapter for banner ads.
-final class InMobiBannerAdAdapter: NSObject, PartnerAdAdapter {
+/// The Helium InMobi adapter banner ad.
+final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
     
-    /// The associated partner adapter.
-    let adapter: PartnerAdapter
-    
-    /// The ad request containing data relevant to load operation.
-    private let request: PartnerAdLoadRequest
-    
-    /// The partner ad delegate to send ad life-cycle events to.
-    private weak var partnerAdDelegate: PartnerAdDelegate?
+    /// The partner ad view to display inline. E.g. a banner view.
+    /// Should be nil for full-screen ads.
+    var inlineView: UIView? { ad }
     
     /// The InMobi ad instance.
     private var ad: IMBanner?
@@ -27,27 +22,20 @@ final class InMobiBannerAdAdapter: NSObject, PartnerAdAdapter {
     /// InMobi's placement ID needed to create a IMBanner instance.
     private let placementID: Int64
     
-    /// A PartnerAd object to send in ad life-cycle events.
-    private lazy var partnerAd = PartnerAd(ad: ad, details: [:], request: request)
-    
-    /// The completion for the ongoing load operation.
-    private var loadCompletion: ((Result<PartnerAd, Error>) -> Void)?
-    
-    init(adapter: PartnerAdapter, request: PartnerAdLoadRequest, partnerAdDelegate: PartnerAdDelegate) throws {
+    override init(adapter: PartnerAdapter, request: PartnerAdLoadRequest, delegate: PartnerAdDelegate) throws {
         guard let placementID = Int64(request.partnerPlacement) else {
-            throw adapter.error(.loadFailure(request), description: "Failed to cast placement to Int64")
+            throw adapter.error(.invalidPlacement, description: "Failed to cast placement to Int64")
         }
-        self.adapter = adapter
-        self.request = request
-        self.partnerAdDelegate = partnerAdDelegate
         self.placementID = placementID
+        try super.init(adapter: adapter, request: request, delegate: delegate)
     }
     
     /// Loads an ad.
-    /// - note: Do not call this method directly, `ModularPartnerAdapter` will take care of it when needed.
     /// - parameter viewController: The view controller on which the ad will be presented on. Needed on load for some banners.
     /// - parameter completion: Closure to be performed once the ad has been loaded.
-    func load(with viewController: UIViewController?, completion: @escaping (Result<HeliumSdk.PartnerAd, Error>) -> Void) {
+    func load(with viewController: UIViewController?, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
+        log(.loadStarted)
+        
         // Save completion for later
         loadCompletion = completion
         
@@ -67,32 +55,34 @@ final class InMobiBannerAdAdapter: NSObject, PartnerAdAdapter {
     }
     
     /// Shows a loaded ad.
-    /// - note: Do not call this method directly, `ModularPartnerAdapter` will take care of it when needed.
+    /// It will never get called for banner ads. You may leave the implementation blank for that ad format.
     /// - parameter viewController: The view controller on which the ad will be presented on.
     /// - parameter completion: Closure to be performed once the ad has been shown.
-    func show(with viewController: UIViewController, completion: @escaping (Result<HeliumSdk.PartnerAd, Error>) -> Void) {
+    func show(with viewController: UIViewController, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
         // no-op
     }
 }
 
-extension InMobiBannerAdAdapter: IMBannerDelegate {
+extension InMobiAdapterBannerAd: IMBannerDelegate {
     
     func bannerDidFinishLoading(_ banner: IMBanner?) {
         // Report load success
-        loadCompletion?(.success(partnerAd)) ?? log(.loadResultIgnored)
+        log(.loadSucceeded)
+        loadCompletion?(.success([:])) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
     
     func banner(_ banner: IMBanner?, didFailToLoadWithError partnerError: IMRequestStatus?) {
         // Report load failure
-        let error = error(.loadFailure(request), error: partnerError)
+        let error = error(.loadFailure, error: partnerError)
+        log(.loadFailed(error))
         loadCompletion?(.failure(error)) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
     
     func banner(_ banner: IMBanner?, didInteractWithParams params: [AnyHashable : Any]?) {
         // Report click
-        log(.didClick(partnerAd, error: nil))
-        partnerAdDelegate?.didClick(partnerAd)
+        log(.didClick(error: nil))
+        delegate?.didClick(self, details: [:])
     }
 }
