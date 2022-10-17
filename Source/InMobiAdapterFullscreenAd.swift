@@ -100,9 +100,7 @@ extension InMobiAdapterFullscreenAd: IMInterstitialDelegate {
     // Note InMobi's IMInterstitial is also used for rewarded ads, thus this method is implemented here although it does not apply to interstitial ads
     func interstitial(_ interstitial: IMInterstitial?, rewardActionCompletedWithRewards rewards: [AnyHashable : Any]?) {
         // Report reward
-        let rewardAmount = rewards?.first?.value as? Int
-        let reward = Reward(amount: rewardAmount, label: nil)
-        log(.didReward(reward))
-        delegate?.didReward(self, details: [:], reward: reward)
+        log(.didReward)
+        delegate?.didReward(self, details: [:])
     }
 }
