@@ -24,12 +24,6 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     
     /// The human-friendly partner name.
     let partnerDisplayName = "InMobi"
-        
-    /// The last value set on `setGDPRApplies(_:)`.
-    private var gdprApplies: Bool?
-    
-    /// The last value set on `setGDPRConsentStatus(_:)`.
-    private var gdprStatus: GDPRConsentStatus?
     
     /// The designated initializer for the adapter.
     /// Helium SDK will use this constructor to create instances of conforming types.
@@ -70,30 +64,16 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         completion(nil)
     }
     
-    /// Indicates if GDPR applies or not.
-    /// - parameter applies: `true` if GDPR applies, `false` otherwise.
-    func setGDPRApplies(_ applies: Bool) {
-        // Save value and set GDPR on InMobi using both gdprApplies and gdprStatus
-        gdprApplies = applies
-        updateGDPRConsent()
-    }
-    
-    /// Indicates the user's GDPR consent status.
+    /// Indicates if GDPR applies or not and the user's GDPR consent status.
+    /// - parameter applies: `true` if GDPR applies, `false` if not, `nil` if the publisher has not provided this information.
     /// - parameter status: One of the `GDPRConsentStatus` values depending on the user's preference.
-    func setGDPRConsentStatus(_ status: GDPRConsentStatus) {
-        // Save value and set GDPR on InMobi using both gdprApplies and gdprStatus
-        gdprStatus = status
-        updateGDPRConsent()
-    }
-    
-    private func updateGDPRConsent() {
-        // Set InMobi GDPR consent using both gdprApplies and gdprStatus
+    func setGDPR(applies: Bool?, status: GDPRConsentStatus) {
         var value: [String: Any] = [:]
-        if let gdprApplies = gdprApplies {
-            value[IM_PARTNER_GDPR_APPLIES] = gdprApplies ? String.gdprApplies : .gdprDoesNotApply
+        if let applies = applies {
+            value[IM_PARTNER_GDPR_APPLIES] = applies ? String.gdprApplies : .gdprDoesNotApply
         }
-        if let gdprStatus = gdprStatus, gdprStatus != .unknown {
-            value[IM_PARTNER_GDPR_CONSENT_AVAILABLE] = gdprStatus == .granted ? String.gdprConsentAvailable : .gdprConsentUnavailable
+        if status != .unknown {
+            value[IM_PARTNER_GDPR_CONSENT_AVAILABLE] = status == .granted ? String.gdprConsentAvailable : .gdprConsentUnavailable
         }
         IMSdk.setPartnerGDPRConsent(value)
         log(.privacyUpdated(setting: "partnerGDPRConsent", value: value))
