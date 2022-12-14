@@ -64,7 +64,11 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
 }
 
 extension InMobiAdapterBannerAd: IMBannerDelegate {
-    
+
+    func bannerAdImpressed(_ banner: IMBanner!) {
+        self.delegate?.didTrackImpression(self, details: [:]) ?? log(.delegateUnavailable)
+    }
+
     func bannerDidFinishLoading(_ banner: IMBanner?) {
         // Report load success
         log(.loadSucceeded)
