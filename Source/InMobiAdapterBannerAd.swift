@@ -42,7 +42,6 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
         // InMobi banner inherits from UIView so we need to instantiate it on the main thread
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            
             // Create the banner
             let frame = CGRect(origin: .zero, size: self.request.size ?? IABStandardAdSize)
             let ad = IMBanner(frame: frame, placementId: self.placementID, delegate: self)
@@ -66,6 +65,7 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
 extension InMobiAdapterBannerAd: IMBannerDelegate {
 
     func bannerAdImpressed(_ banner: IMBanner!) {
+        log(.didTrackImpression)
         self.delegate?.didTrackImpression(self, details: [:]) ?? log(.delegateUnavailable)
     }
 
