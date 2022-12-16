@@ -46,10 +46,7 @@ final class InMobiAdapterFullscreenAd: InMobiAdapterAd, PartnerAd {
     func show(with viewController: UIViewController, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
         log(.showStarted)
         showCompletion = completion
-        // InMobi makes use of UI-related APIs directly from the thread show() is called, so we need to do it on the main thread
-        DispatchQueue.main.async {
-            self.ad.show(from: viewController)
-        }
+        ad.show(from: viewController)
     }
 }
 
