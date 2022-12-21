@@ -14,10 +14,7 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
     
     /// The partner ad view to display inline. E.g. a banner view.
     /// Should be nil for full-screen ads.
-    var inlineView: UIView? { ad }
-    
-    /// The InMobi ad instance.
-    private var ad: IMBanner?
+    var inlineView: UIView?
     
     /// InMobi's placement ID needed to create a IMBanner instance.
     private let placementID: Int64
@@ -39,18 +36,14 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
         // Save completion for later
         loadCompletion = completion
         
-        // InMobi banner inherits from UIView so we need to instantiate it on the main thread
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            // Create the banner
-            let frame = CGRect(origin: .zero, size: self.request.size ?? IABStandardAdSize)
-            let ad = IMBanner(frame: frame, placementId: self.placementID, delegate: self)
-            self.ad = ad
-            ad?.shouldAutoRefresh(false)
-            
-            // Load it
-            ad?.load()
-        }
+        // Create the banner
+        let frame = CGRect(origin: .zero, size: request.size ?? IABStandardAdSize)
+        let ad = IMBanner(frame: frame, placementId: placementID, delegate: self)
+        ad?.shouldAutoRefresh(false)
+        inlineView = ad
+        
+        // Load it
+        ad?.load()
     }
     
     /// Shows a loaded ad.
@@ -66,7 +59,7 @@ extension InMobiAdapterBannerAd: IMBannerDelegate {
 
     func bannerAdImpressed(_ banner: IMBanner!) {
         log(.didTrackImpression)
-        self.delegate?.didTrackImpression(self, details: [:]) ?? log(.delegateUnavailable)
+        delegate?.didTrackImpression(self, details: [:]) ?? log(.delegateUnavailable)
     }
 
     func bannerDidFinishLoading(_ banner: IMBanner?) {
