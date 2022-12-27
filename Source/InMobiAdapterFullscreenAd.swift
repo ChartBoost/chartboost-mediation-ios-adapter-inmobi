@@ -21,7 +21,7 @@ final class InMobiAdapterFullscreenAd: InMobiAdapterAd, PartnerAd {
     
     override init(adapter: PartnerAdapter, request: PartnerAdLoadRequest, delegate: PartnerAdDelegate) throws {
         guard let placementID = Int64(request.partnerPlacement) else {
-            throw adapter.error(.invalidPlacement, description: "Failed to cast placement to Int64")
+            throw adapter.error(.loadFailureInvalidPartnerPlacement, description: "Failed to cast placement to Int64")
         }
         self.ad = IMInterstitial(placementId: placementID)
         
@@ -61,7 +61,7 @@ extension InMobiAdapterFullscreenAd: IMInterstitialDelegate {
     
     func interstitial(_ interstitial: IMInterstitial?, didFailToLoadWithError partnerError: IMRequestStatus?) {
         // Report load failure
-        let error = error(.loadFailure, error: partnerError)
+        let error = error(.loadFailureException, error: partnerError)
         log(.loadFailed(error))
         loadCompletion?(.failure(error)) ?? log(.loadResultIgnored)
         loadCompletion = nil
@@ -76,7 +76,7 @@ extension InMobiAdapterFullscreenAd: IMInterstitialDelegate {
     
     func interstitial(_ interstitial: IMInterstitial?, didFailToPresentWithError partnerError: IMRequestStatus?) {
         // Report show failure
-        let error = error(.showFailure, error: partnerError)
+        let error = error(.showFailureException, error: partnerError)
         log(.showFailed(error))
         showCompletion?(.failure(error)) ?? log(.showResultIgnored)
         showCompletion = nil
