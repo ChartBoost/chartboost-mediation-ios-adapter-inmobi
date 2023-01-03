@@ -21,7 +21,7 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
     
     override init(adapter: PartnerAdapter, request: PartnerAdLoadRequest, delegate: PartnerAdDelegate) throws {
         guard let placementID = Int64(request.partnerPlacement) else {
-            throw adapter.error(.invalidPlacement, description: "Failed to cast placement to Int64")
+            throw adapter.error(.loadFailureInvalidPartnerPlacement, description: "Failed to cast placement to Int64")
         }
         self.placementID = placementID
         try super.init(adapter: adapter, request: request, delegate: delegate)
@@ -71,7 +71,7 @@ extension InMobiAdapterBannerAd: IMBannerDelegate {
     
     func banner(_ banner: IMBanner?, didFailToLoadWithError partnerError: IMRequestStatus?) {
         // Report load failure
-        let error = error(.loadFailure, error: partnerError)
+        let error = error(.loadFailureUnknown, error: partnerError)
         log(.loadFailed(error))
         loadCompletion?(.failure(error)) ?? log(.loadResultIgnored)
         loadCompletion = nil

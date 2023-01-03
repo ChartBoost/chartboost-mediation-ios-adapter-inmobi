@@ -39,7 +39,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         log(.setUpStarted)
         // Get credentials, fail early if they are unavailable
         guard let accountID = configuration.accountID else {
-            let error = error(.missingSetUpParameter(key: .accountIDKey))
+            let error = error(.initializationFailureInvalidCredentials, description: "Missing \(String.accountIDKey)")
             log(.setUpFailed(error))
             completion(error)
             return
@@ -47,7 +47,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         // Initialize InMobi
         IMSdk.initWithAccountID(accountID) { [self] partnerError in
             if let partnerError = partnerError {
-                let error = error(.setUpFailure, error: partnerError)
+                let error = error(.initializationFailureUnknown, error: partnerError)
                 log(.setUpFailed(error))
                 completion(error)
             } else {
@@ -107,7 +107,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         case .banner:
             return try InMobiAdapterBannerAd(adapter: self, request: request, delegate: delegate)
         @unknown default:
-            throw error(.adFormatNotSupported(request))
+            throw error(.loadFailureUnsupportedAdFormat)
         }
     }
 }
