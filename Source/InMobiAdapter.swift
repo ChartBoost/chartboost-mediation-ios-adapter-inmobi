@@ -47,7 +47,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         // Initialize InMobi
         IMSdk.initWithAccountID(accountID) { [self] partnerError in
             if let partnerError = partnerError {
-                let error = error(.initializationFailurePartnerNotIntegrated, error: partnerError)
+                let error = error(.initializationFailureUnknown, error: partnerError)
                 log(.setUpFailed(error))
                 completion(error)
             } else {
