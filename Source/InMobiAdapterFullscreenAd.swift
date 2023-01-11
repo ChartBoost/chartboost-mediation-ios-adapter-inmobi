@@ -61,7 +61,7 @@ extension InMobiAdapterFullscreenAd: IMInterstitialDelegate {
     
     func interstitial(_ interstitial: IMInterstitial?, didFailToLoadWithError partnerError: IMRequestStatus?) {
         // Report load failure
-        let error = error(.loadFailureUnknown, error: partnerError)
+        let error = partnerError ?? self.error(.loadFailureUnknown)
         log(.loadFailed(error))
         loadCompletion?(.failure(error)) ?? log(.loadResultIgnored)
         loadCompletion = nil
@@ -76,7 +76,7 @@ extension InMobiAdapterFullscreenAd: IMInterstitialDelegate {
     
     func interstitial(_ interstitial: IMInterstitial?, didFailToPresentWithError partnerError: IMRequestStatus?) {
         // Report show failure
-        let error = error(.showFailureUnknown, error: partnerError)
+        let error = partnerError ?? self.error(.showFailureUnknown)
         log(.showFailed(error))
         showCompletion?(.failure(error)) ?? log(.showResultIgnored)
         showCompletion = nil
