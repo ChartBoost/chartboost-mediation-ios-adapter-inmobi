@@ -71,7 +71,7 @@ extension InMobiAdapterBannerAd: IMBannerDelegate {
     
     func banner(_ banner: IMBanner?, didFailToLoadWithError partnerError: IMRequestStatus?) {
         // Report load failure
-        let error = error(.loadFailureUnknown, error: partnerError)
+        let error = partnerError ?? self.error(.loadFailureUnknown)
         log(.loadFailed(error))
         loadCompletion?(.failure(error)) ?? log(.loadResultIgnored)
         loadCompletion = nil
