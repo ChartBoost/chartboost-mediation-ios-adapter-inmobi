@@ -10,8 +10,8 @@
 //  Created by Daniel Barros on 10/4/22.
 //
 
+import ChartboostMediationSDK
 import Foundation
-import HeliumSdk
 import InMobiSDK
 
 /// The Helium InMobi adapter banner ad.
