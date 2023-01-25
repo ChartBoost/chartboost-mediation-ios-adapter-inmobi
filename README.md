@@ -1,6 +1,6 @@
 # Chartboost Mediation InMobi Adapter
 
-The Chartboost Mediation InMobi adapter mediates the InMobi SDK into the Chartboost Mediation SDK.
+The Chartboost Mediation InMobi adapter mediates InMobi via the Chartboost Mediation SDK.
 
 ## Minimum Requirements
 
