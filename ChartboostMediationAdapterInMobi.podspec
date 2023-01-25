@@ -1,15 +1,15 @@
 Pod::Spec.new do |spec|
-  spec.name        = 'ChartboostHeliumAdapterInMobi'
+  spec.name        = 'ChartboostMediationAdapterInMobi'
   spec.version     = '4.10.1.2.0'
   spec.license     = { :type => 'MIT', :file => 'LICENSE.md' }
-  spec.homepage    = 'https://github.com/ChartBoost/helium-ios-adapter-inmobi'
+  spec.homepage    = 'https://github.com/ChartBoost/chartboost-mediation-ios-adapter-inmobi'
   spec.authors     = { 'Chartboost' => 'https://www.chartboost.com/' }
-  spec.summary     = 'Helium iOS SDK InMobi adapter.'
-  spec.description = 'InMobi Adapters for mediating through Helium. Supported ad formats: Banner, Interstitial, and Rewarded.'
+  spec.summary     = 'Chartboost Mediation iOS SDK InMobi adapter.'
+  spec.description = 'InMobi Adapters for mediating through Chartboost Mediation. Supported ad formats: Banner, Interstitial, and Rewarded.'
 
   # Source
-  spec.module_name  = 'HeliumAdapterInMobi'
-  spec.source       = { :git => 'https://github.com/ChartBoost/helium-ios-adapter-inmobi.git', :tag => spec.version }
+  spec.module_name  = 'ChartboostMediationAdapterInMobi'
+  spec.source       = { :git => 'https://github.com/ChartBoost/chartboost-mediation-ios-adapter-inmobi.git', :tag => spec.version }
   spec.source_files = 'Source/**/*.{swift}'
 
   # Minimum supported versions
@@ -19,8 +19,8 @@ Pod::Spec.new do |spec|
   # System frameworks used
   spec.ios.frameworks = ['Foundation', 'UIKit']
   
-  # This adapter is compatible with all Helium 4.X versions of the SDK.
-  spec.dependency 'ChartboostHelium', '~> 4.0'
+  # This adapter is compatible with all Chartboost Mediation 4.X versions of the SDK.
+  spec.dependency 'ChartboostMediationSDK', '~> 4.0'
 
   # Partner network SDK and version that this adapter is certified to work with.
   spec.dependency 'InMobiSDK', '10.1.2'
