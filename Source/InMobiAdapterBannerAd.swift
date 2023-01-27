@@ -5,7 +5,7 @@
 
 //
 //  InMobiAdapterBannerAd.swift
-//  HeliumAdapterInMobi
+//  ChartboostMediationAdapterInMobi
 //
 //  Created by Daniel Barros on 10/4/22.
 //
@@ -14,7 +14,7 @@ import ChartboostMediationSDK
 import Foundation
 import InMobiSDK
 
-/// The Helium InMobi adapter banner ad.
+/// The Chartboost Mediation InMobi adapter banner ad.
 final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
     
     /// The partner ad view to display inline. E.g. a banner view.

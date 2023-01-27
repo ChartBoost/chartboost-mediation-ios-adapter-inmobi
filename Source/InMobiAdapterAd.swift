@@ -5,7 +5,7 @@
 
 //
 //  InMobiAdapterBannerAd.swift
-//  HeliumAdapterInMobi
+//  ChartboostMediationAdapterInMobi
 //
 //  Created by Daniel Barros on 10/4/22.
 //
@@ -14,7 +14,7 @@ import ChartboostMediationSDK
 import Foundation
 import InMobiSDK
 
-/// Base class for Helium InMobi adapter ads.
+/// Base class for Chartboost Mediation InMobi adapter ads.
 class InMobiAdapterAd: NSObject {
     
     /// The partner adapter that created this ad.

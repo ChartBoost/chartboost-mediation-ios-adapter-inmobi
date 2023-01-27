@@ -5,7 +5,7 @@
 
 //
 //  InMobiAdapter.swift
-//  HeliumAdapterInMobi
+//  ChartboostMediationAdapterInMobi
 //
 //  Created by Daniel Barros on 10/4/22.
 //
@@ -14,15 +14,15 @@ import ChartboostMediationSDK
 import Foundation
 import InMobiSDK
 
-/// The Helium InMobi adapter.
+/// The Chartboost Mediation InMobi adapter.
 final class InMobiAdapter: NSObject, PartnerAdapter {
     
     /// The version of the partner SDK.
     let partnerSDKVersion = IMSdk.getVersion()
     
     /// The version of the adapter.
-    /// It should have either 5 or 6 digits separated by periods, where the first digit is Helium SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
-    /// Format: `<Helium major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
+    /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
+    /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
     let adapterVersion = "4.10.1.2.0"
     
     /// The partner's unique identifier.
@@ -32,8 +32,8 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     let partnerDisplayName = "InMobi"
     
     /// The designated initializer for the adapter.
-    /// Helium SDK will use this constructor to create instances of conforming types.
-    /// - parameter storage: An object that exposes storage managed by the Helium SDK to the adapter.
+    /// Chartboost Mediation SDK will use this constructor to create instances of conforming types.
+    /// - parameter storage: An object that exposes storage managed by the Chartboost Mediation SDK to the adapter.
     /// It includes a list of created `PartnerAd` instances. You may ignore this parameter if you don't need it.
     init(storage: PartnerAdapterStorage) {}
     
@@ -98,8 +98,8 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     }
     
     /// Creates a new ad object in charge of communicating with a single partner SDK ad instance.
-    /// Helium SDK calls this method to create a new ad for each new load request. Ad instances are never reused.
-    /// Helium SDK takes care of storing and disposing of ad instances so you don't need to.
+    /// Chartboost Mediation SDK calls this method to create a new ad for each new load request. Ad instances are never reused.
+    /// Chartboost Mediation SDK takes care of storing and disposing of ad instances so you don't need to.
     /// `invalidate()` is called on ads before disposing of them in case partners need to perform any custom logic before the object gets destroyed.
     /// If, for some reason, a new ad cannot be provided, an error should be thrown.
     /// - parameter request: Information about the ad load request.
