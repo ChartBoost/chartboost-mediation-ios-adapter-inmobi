@@ -50,10 +50,10 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             return
         }
         // Initialize InMobi
-        IMSdk.initWithAccountID(accountID) { [self] partnerError in
-            if let partnerError = partnerError {
-                log(.setUpFailed(partnerError))
-                completion(partnerError)
+        IMSdk.initWithAccountID(accountID) { [self] error in
+            if let error = error {
+                log(.setUpFailed(error))
+                completion(error)
             } else {
                 log(.setUpSucceded)
                 completion(nil)
@@ -112,6 +112,45 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             return try InMobiAdapterBannerAd(adapter: self, request: request, delegate: delegate)
         @unknown default:
             throw error(.loadFailureUnsupportedAdFormat)
+        }
+    }
+    
+    /// Maps a partner load error to a Helium error code.
+    /// Helium SDK calls this method when a load completion is called with a partner error.
+    ///
+    /// A default implementation is provided that returns `nil`.
+    /// Only implement if the partner SDK provides its own list of error codes that can be mapped to Helium's.
+    /// If some case cannot be mapped return `nil` to let Helium choose a default error code.
+    func mapLoadError(_ error: Error) -> HeliumError.Code? {
+        guard let error = error as? IMRequestStatus,
+              let code = IMStatusCode(rawValue: error.code) else {
+            return nil
+        }
+        switch code {
+        case .networkUnReachable:
+            return .loadFailureNoConnectivity
+        case .noFill:
+            return .loadFailureNoFill
+        case .requestInvalid:
+            return .loadFailureInvalidAdRequest
+        case .requestPending:
+            return .loadFailureLoadInProgress
+        case .requestTimedOut:
+            return .loadFailureTimeout
+        case .multipleLoadsOnSameInstance:
+            return .loadFailureLoadInProgress
+        case .internalError:
+            return .loadFailureUnknown
+        case .serverError:
+            return .loadFailureServerError
+        case .adActive:
+            return .loadFailureShowInProgress
+        case .earlyRefreshRequest:
+            return .loadFailureAborted
+        case .droppingNetworkRequest:
+            return .loadFailureNetworkingError
+        @unknown default:
+            return nil
         }
     }
 }
