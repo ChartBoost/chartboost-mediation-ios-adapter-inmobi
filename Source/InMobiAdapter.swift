@@ -66,6 +66,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// - parameter applies: `true` if GDPR applies, `false` if not, `nil` if the publisher has not provided this information.
     /// - parameter status: One of the `GDPRConsentStatus` values depending on the user's preference.
     func setGDPR(applies: Bool?, status: GDPRConsentStatus) {
+        // See IMSdk.setPartnerGDPRConsent(_:) documentation on IMSdk.h
         var value: [String: Any] = [:]
         if let applies = applies {
             value[IM_PARTNER_GDPR_APPLIES] = applies ? String.gdprApplies : .gdprDoesNotApply
@@ -87,7 +88,9 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// Indicates if the user is subject to COPPA or not.
     /// - parameter isChildDirected: `true` if the user is subject to COPPA, `false` otherwise.
     func setCOPPA(isChildDirected: Bool) {
-        // InMobi SDK does not provide COPPA APIs
+        // See https://support.inmobi.com/monetize/sdk-documentation/ios-guidelines/overview-ios-guidelines#optimizing-data
+        IMSdk.setIsAgeRestricted(isChildDirected)
+        log(.privacyUpdated(setting: "isAgeRestricted", value: isChildDirected))
     }
     
     /// Creates a new ad object in charge of communicating with a single partner SDK ad instance.
