@@ -98,4 +98,10 @@ extension InMobiAdapterFullscreenAd: IMInterstitialDelegate {
         log(.didReward)
         delegate?.didReward(self, details: [:])
     }
+    
+    func interstitialAdImpressed(_ interstitial: IMInterstitial?) {
+        // Report impression
+        log(.didTrackImpression)
+        delegate?.didTrackImpression(self, details: [:]) ?? log(.delegateUnavailable)
+    }
 }
