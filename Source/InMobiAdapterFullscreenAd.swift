@@ -83,19 +83,25 @@ extension InMobiAdapterFullscreenAd: IMInterstitialDelegate {
     func interstitialDidDismiss(_ interstitial: IMInterstitial?) {
         // Report dismiss
         log(.didDismiss(error: nil))
-        delegate?.didDismiss(self, details: [:], error: nil)
+        delegate?.didDismiss(self, details: [:], error: nil) ?? log(.delegateUnavailable)
     }
     
     func interstitial(_ interstitial: IMInterstitial?, didInteractWithParams params: [AnyHashable : Any]?) {
         // Report click
         log(.didClick(error: nil))
-        delegate?.didClick(self, details: [:])
+        delegate?.didClick(self, details: [:]) ?? log(.delegateUnavailable)
     }
     
     // Note InMobi's IMInterstitial is also used for rewarded ads, thus this method is implemented here although it does not apply to interstitial ads
     func interstitial(_ interstitial: IMInterstitial?, rewardActionCompletedWithRewards rewards: [AnyHashable : Any]?) {
         // Report reward
         log(.didReward)
-        delegate?.didReward(self, details: [:])
+        delegate?.didReward(self, details: [:]) ?? log(.delegateUnavailable)
+    }
+    
+    func interstitialAdImpressed(_ interstitial: IMInterstitial?) {
+        // Report impression
+        log(.didTrackImpression)
+        delegate?.didTrackImpression(self, details: [:]) ?? log(.delegateUnavailable)
     }
 }

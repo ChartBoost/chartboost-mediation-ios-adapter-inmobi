@@ -78,6 +78,6 @@ extension InMobiAdapterBannerAd: IMBannerDelegate {
     func banner(_ banner: IMBanner?, didInteractWithParams params: [AnyHashable : Any]?) {
         // Report click
         log(.didClick(error: nil))
-        delegate?.didClick(self, details: [:])
+        delegate?.didClick(self, details: [:]) ?? log(.delegateUnavailable)
     }
 }
