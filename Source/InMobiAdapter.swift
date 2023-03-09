@@ -43,13 +43,17 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             return
         }
         // Initialize InMobi
-        IMSdk.initWithAccountID(accountID) { [self] error in
-            if let error = error {
-                log(.setUpFailed(error))
-                completion(error)
-            } else {
-                log(.setUpSucceded)
-                completion(nil)
+        // It's necessary to call `initWithAccountID` on the main thread because it appears to
+        // occasionally use WebKit APIs that must be accessed on the main thread.
+        DispatchQueue.main.async { [self] in
+            IMSdk.initWithAccountID(accountID) { [self] error in
+                if let error = error {
+                    log(.setUpFailed(error))
+                    completion(error)
+                } else {
+                    log(.setUpSucceded)
+                    completion(nil)
+                }
             }
         }
     }
