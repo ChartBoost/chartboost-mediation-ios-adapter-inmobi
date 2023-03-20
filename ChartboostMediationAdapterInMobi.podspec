@@ -23,7 +23,7 @@ Pod::Spec.new do |spec|
   spec.dependency 'ChartboostMediationSDK', '~> 4.0'
 
   # Partner network SDK and version that this adapter is certified to work with.
-  spec.dependency 'InMobiSDK', '10.1.2'
+  spec.dependency 'InMobiSDK', '10.1.1'
   
   # The partner network SDK is a static framework which requires the static_framework option.
   spec.static_framework = true
