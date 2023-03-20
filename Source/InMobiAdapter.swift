@@ -16,7 +16,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
     /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
-    let adapterVersion = "4.10.1.2.1"
+    let adapterVersion = "4.10.1.3.0"
     
     /// The partner's unique identifier.
     let partnerIdentifier = "inmobi"
@@ -43,13 +43,17 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             return
         }
         // Initialize InMobi
-        IMSdk.initWithAccountID(accountID) { [self] error in
-            if let error = error {
-                log(.setUpFailed(error))
-                completion(error)
-            } else {
-                log(.setUpSucceded)
-                completion(nil)
+        // It's necessary to call `initWithAccountID` on the main thread because it appears to
+        // occasionally use WebKit APIs that must be accessed on the main thread.
+        DispatchQueue.main.async { [self] in
+            IMSdk.initWithAccountID(accountID) { [self] error in
+                if let error = error {
+                    log(.setUpFailed(error))
+                    completion(error)
+                } else {
+                    log(.setUpSucceded)
+                    completion(nil)
+                }
             }
         }
     }
