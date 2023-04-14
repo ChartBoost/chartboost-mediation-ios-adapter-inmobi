@@ -55,27 +55,27 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
 
 extension InMobiAdapterBannerAd: IMBannerDelegate {
 
-    func bannerAdImpressed(_ banner: IMBanner!) {
+    func bannerAdImpressed(_ banner: IMBanner) {
         log(.didTrackImpression)
         delegate?.didTrackImpression(self, details: [:]) ?? log(.delegateUnavailable)
     }
 
-    func bannerDidFinishLoading(_ banner: IMBanner?) {
+    func bannerDidFinishLoading(_ banner: IMBanner) {
         // Report load success
         log(.loadSucceeded)
         loadCompletion?(.success([:])) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
     
-    func banner(_ banner: IMBanner?, didFailToLoadWithError partnerError: IMRequestStatus?) {
+    func banner(_ banner: IMBanner, didFailToLoadWithError partnerError: IMRequestStatus) {
         // Report load failure
-        let error = partnerError ?? self.error(.loadFailureUnknown)
+        let error = partnerError
         log(.loadFailed(error))
         loadCompletion?(.failure(error)) ?? log(.loadResultIgnored)
         loadCompletion = nil
     }
     
-    func banner(_ banner: IMBanner?, didInteractWithParams params: [AnyHashable : Any]?) {
+    func banner(_ banner: IMBanner, didInteractWithParams params: [String : Any]?) {
         // Report click
         log(.didClick(error: nil))
         delegate?.didClick(self, details: [:]) ?? log(.delegateUnavailable)

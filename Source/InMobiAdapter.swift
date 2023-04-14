@@ -149,6 +149,12 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             return .loadFailureAborted
         case .droppingNetworkRequest:
             return .loadFailureNetworkingError
+        case .incorrectPlacementID:
+            return .loadFailureInvalidPartnerPlacement
+        case .sdkNotInitialised:
+            return .loadFailurePartnerNotInitialized
+        case .invalidBannerframe:
+            return .loadFailureInvalidBannerSize
         @unknown default:
             return nil
         }
