@@ -155,7 +155,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             return .loadFailurePartnerNotInitialized
         case .invalidBannerframe:
             return .loadFailureInvalidBannerSize
-        @unknown default:
+        default:
             return nil
         }
     }
