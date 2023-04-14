@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name        = 'ChartboostMediationAdapterInMobi'
-  spec.version     = '4.10.1.3.0'
+  spec.version     = '4.10.5.0.0'
   spec.license     = { :type => 'MIT', :file => 'LICENSE.md' }
   spec.homepage    = 'https://github.com/ChartBoost/chartboost-mediation-ios-adapter-inmobi'
   spec.authors     = { 'Chartboost' => 'https://www.chartboost.com/' }
@@ -23,7 +23,7 @@ Pod::Spec.new do |spec|
   spec.dependency 'ChartboostMediationSDK', '~> 4.0'
 
   # Partner network SDK and version that this adapter is certified to work with.
-  spec.dependency 'InMobiSDK', '10.1.3'
+  spec.dependency 'InMobiSDK', '~> 10.5.0'
   
   # The partner network SDK is a static framework which requires the static_framework option.
   spec.static_framework = true
