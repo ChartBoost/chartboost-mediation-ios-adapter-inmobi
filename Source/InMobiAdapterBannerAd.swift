@@ -37,11 +37,11 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
         // Create the banner
         let frame = CGRect(origin: .zero, size: request.size ?? IABStandardAdSize)
         let ad = IMBanner(frame: frame, placementId: placementID, delegate: self)
-        ad?.shouldAutoRefresh(false)
+        ad.shouldAutoRefresh(false)
         inlineView = ad
         
         // Load it
-        ad?.load()
+        ad.load()
     }
     
     /// Shows a loaded ad.

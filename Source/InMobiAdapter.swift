@@ -73,10 +73,10 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         // See IMSdk.setPartnerGDPRConsent(_:) documentation on IMSdk.h
         var value: [String: Any] = [:]
         if let applies = applies {
-            value[IM_PARTNER_GDPR_APPLIES] = applies ? String.gdprApplies : .gdprDoesNotApply
+            value[IMCommonConstants.IM_PARTNER_GDPR_APPLIES] = applies ? String.gdprApplies : .gdprDoesNotApply
         }
         if status != .unknown {
-            value[IM_PARTNER_GDPR_CONSENT_AVAILABLE] = status == .granted ? String.gdprConsentAvailable : .gdprConsentUnavailable
+            value[IMCommonConstants.IM_PARTNER_GDPR_CONSENT_AVAILABLE] = status == .granted ? String.gdprConsentAvailable : .gdprConsentUnavailable
         }
         IMSdk.setPartnerGDPRConsent(value)
         log(.privacyUpdated(setting: "partnerGDPRConsent", value: value))
