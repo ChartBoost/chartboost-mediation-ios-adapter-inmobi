@@ -110,7 +110,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             return try InMobiAdapterFullscreenAd(adapter: self, request: request, delegate: delegate)
         case .banner:
             return try InMobiAdapterBannerAd(adapter: self, request: request, delegate: delegate)
-        @unknown default:
+        default:
             throw error(.loadFailureUnsupportedAdFormat)
         }
     }
