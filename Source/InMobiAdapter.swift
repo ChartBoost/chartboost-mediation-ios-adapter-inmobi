@@ -16,7 +16,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
     /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
-    let adapterVersion = "4.10.1.3.0"
+    let adapterVersion = "4.10.5.0.0"
     
     /// The partner's unique identifier.
     let partnerIdentifier = "inmobi"
@@ -73,10 +73,10 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         // See IMSdk.setPartnerGDPRConsent(_:) documentation on IMSdk.h
         var value: [String: Any] = [:]
         if let applies = applies {
-            value[IM_PARTNER_GDPR_APPLIES] = applies ? String.gdprApplies : .gdprDoesNotApply
+            value[IMCommonConstants.IM_PARTNER_GDPR_APPLIES] = applies ? String.gdprApplies : .gdprDoesNotApply
         }
         if status != .unknown {
-            value[IM_PARTNER_GDPR_CONSENT_AVAILABLE] = status == .granted ? String.gdprConsentAvailable : .gdprConsentUnavailable
+            value[IMCommonConstants.IM_PARTNER_GDPR_CONSENT_AVAILABLE] = status == .granted ? String.gdprConsentAvailable : .gdprConsentUnavailable
         }
         IMSdk.setPartnerGDPRConsent(value)
         log(.privacyUpdated(setting: "partnerGDPRConsent", value: value))
@@ -149,7 +149,13 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             return .loadFailureAborted
         case .droppingNetworkRequest:
             return .loadFailureNetworkingError
-        @unknown default:
+        case .incorrectPlacementID:
+            return .loadFailureInvalidPartnerPlacement
+        case .sdkNotInitialised:
+            return .loadFailurePartnerNotInitialized
+        case .invalidBannerframe:
+            return .loadFailureInvalidBannerSize
+        default:
             return nil
         }
     }
