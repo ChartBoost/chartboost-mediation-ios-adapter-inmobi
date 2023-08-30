@@ -8,7 +8,7 @@ Adapters are compatible with any Chartboost Mediation SDK version within that ma
 - This version of the adapters has been certified with InMobiSDK-Swift 10.5.0.
 
 ### 4.10.5.0.0
-- This version of the adapters has been certified with InMobiSDK 10.5.0.
+- This version of the adapters has been certified with InMobiSDK-Swift 10.5.0.
 
 ### 4.10.1.3.0
 - This version of the adapters has been certified with InMobiSDK 10.1.3.
