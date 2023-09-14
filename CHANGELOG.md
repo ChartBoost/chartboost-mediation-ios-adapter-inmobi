@@ -4,7 +4,8 @@ Note the first digit of every adapter version corresponds to the major version o
 Adapters are compatible with any Chartboost Mediation SDK version within that major version.
 
 ### 4.10.5.6.0
-- This version of the adapters has been certified with InMobiSDK-Swift 10.5.6.
+- Update to InMobi's new SDK name.
+- This version of the adapters has been certified with InMobiSDK 10.5.6.
 
 ### 4.10.5.0.1
 - Add support for Adaptive Banners.
