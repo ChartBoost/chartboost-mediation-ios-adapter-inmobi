@@ -9,7 +9,10 @@ import InMobiSDK
 
 /// The Chartboost Mediation InMobi adapter.
 final class InMobiAdapter: NSObject, PartnerAdapter {
-    
+    /// This key for the TCFv2 string when stored in UserDefaults is defined by the IAB in Consent Management Platform API Final v.2.2 May 2023
+    /// https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#what-is-the-cmp-in-app-internal-structure-for-the-defined-api
+    private let tcfv2Key = "IABTCF_TCString"
+
     /// The version of the partner SDK.
     let partnerSDKVersion = IMSdk.getVersion()
     
@@ -77,6 +80,9 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         }
         if status != .unknown {
             value[IMCommonConstants.IM_PARTNER_GDPR_CONSENT_AVAILABLE] = status == .granted ? String.gdprConsentAvailable : .gdprConsentUnavailable
+        }
+        if let tcfString = UserDefaults.standard.string(forKey: tcfv2Key) {
+            value[IMCommonConstants.IM_GDPR_CONSENT_IAB] = tcfString
         }
         IMSdk.setPartnerGDPRConsent(value)
         log(.privacyUpdated(setting: "partnerGDPRConsent", value: value))
