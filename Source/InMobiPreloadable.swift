@@ -10,5 +10,5 @@ import ChartboostMediationSDK
 
 protocol InMobiPreloadable {
     /// Requesting an ad for bid.
-    func preload(completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
+    func preload(completion: @escaping (Result<PartnerEventDetails, Error>) -> Void)
 }
