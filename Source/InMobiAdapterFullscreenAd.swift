@@ -8,7 +8,7 @@ import Foundation
 import InMobiSDK
 
 /// The Chartboost Mediation InMobi adapter fullscreen ad.
-final class InMobiAdapterFullscreenAd: InMobiAdapterAd, PartnerAd {
+final class InMobiAdapterFullscreenAd: InMobiAdapterAd, InMobiPreloadable, PartnerAd {
     
     /// The partner ad view to display inline. E.g. a banner view.
     /// Should be nil for full-screen ads.
@@ -27,7 +27,13 @@ final class InMobiAdapterFullscreenAd: InMobiAdapterAd, PartnerAd {
         
         self.ad.delegate = self
     }
-    
+
+    /// Requesting an full screen ad for bid.
+    func preload(completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
+        preloadCompletion = completion
+        ad.preloadManager.preload()
+    }
+
     /// Loads an ad.
     /// - parameter viewController: The view controller on which the ad will be presented on. Needed on load for some banners.
     /// - parameter completion: Closure to be performed once the ad has been loaded.
@@ -50,6 +56,17 @@ final class InMobiAdapterFullscreenAd: InMobiAdapterAd, PartnerAd {
 
 extension InMobiAdapterFullscreenAd: IMInterstitialDelegate {
     
+    func interstitial(_ interstitial: IMInterstitial, didReceiveWithMetaInfo metaInfo: IMAdMetaInfo) {
+        let bidInfo = Dictionary(uniqueKeysWithValues: metaInfo.bidInfo.map { ($0, String(describing: $1)) })
+        preloadCompletion?(.success(bidInfo))
+        preloadCompletion = nil
+    }
+
+    func interstitial(_ interstitial: IMInterstitial, didFailToReceiveWithError error: Error) {
+        preloadCompletion?(.failure(error))
+        preloadCompletion = nil
+    }
+
     func interstitialDidFinishLoading(_ interstitial: IMInterstitial) {
         // Report load success
         log(.loadSucceeded)

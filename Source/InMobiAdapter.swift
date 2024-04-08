@@ -9,6 +9,17 @@ import InMobiSDK
 
 /// The Chartboost Mediation InMobi adapter.
 final class InMobiAdapter: NSObject, PartnerAdapter {
+    /// Specialized error cases for the InMobi adapter.
+    enum InMobiAdapterError: LocalizedError {
+        case failedToFindAdDuringPrebid
+
+        var errorDescription: String? {
+            switch self {
+            case .failedToFindAdDuringPrebid: return "Failed to find ad during prebid."
+            }
+        }
+    }
+
     /// This key for the TCFv2 string when stored in UserDefaults is defined by the IAB in Consent Management Platform API Final v.2.2 May 2023
     /// https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#what-is-the-cmp-in-app-internal-structure-for-the-defined-api
     private let tcfv2Key = "IABTCF_TCString"
@@ -19,7 +30,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
     /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
-    let adapterVersion = "4.10.7.0.0"
+    let adapterVersion = "4.10.7.0.1"
     
     /// The partner's unique identifier.
     let partnerIdentifier = "inmobi"
@@ -27,11 +38,16 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// The human-friendly partner name.
     let partnerDisplayName = "InMobi"
     
+    /// Ad storage managed by Chartboost Mediation SDK.
+    let storage: PartnerAdapterStorage
+
     /// The designated initializer for the adapter.
     /// Chartboost Mediation SDK will use this constructor to create instances of conforming types.
     /// - parameter storage: An object that exposes storage managed by the Chartboost Mediation SDK to the adapter.
     /// It includes a list of created `PartnerAd` instances. You may ignore this parameter if you don't need it.
-    init(storage: PartnerAdapterStorage) {}
+    init(storage: PartnerAdapterStorage) {
+        self.storage = storage
+    }
     
     /// Does any setup needed before beginning to load ads.
     /// - parameter configuration: Configuration data for the adapter to set up.
@@ -65,8 +81,26 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// - parameter request: Information about the ad load request.
     /// - parameter completion: Closure to be performed with the fetched info.
     func fetchBidderInformation(request: PreBidRequest, completion: @escaping ([String : String]?) -> Void) {
-        // InMobi does not currently provide any bidding token
-        completion(nil)
+        log(.fetchBidderInfoStarted(request))
+
+        guard let preloadableAd: InMobiPreloadable = storage.ads.first(where: {
+            $0 is InMobiPreloadable && $0.request.chartboostPlacement == request.chartboostPlacement
+        }) as? InMobiPreloadable else{
+            log(.fetchBidderInfoFailed(request, error: InMobiAdapterError.failedToFindAdDuringPrebid))
+            completion(nil)
+            return
+        }
+        
+        preloadableAd.preload { result in
+            switch result {
+            case .success(let details):
+                self.log(.fetchBidderInfoSucceeded(request))
+                completion(details)
+            case .failure(let error):
+                self.log(.fetchBidderInfoFailed(request, error: error))
+                completion(nil)
+            }
+        }
     }
     
     /// Indicates if GDPR applies or not and the user's GDPR consent status.

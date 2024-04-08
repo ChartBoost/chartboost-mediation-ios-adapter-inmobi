@@ -20,7 +20,10 @@ class InMobiAdapterAd: NSObject {
     /// The partner ad delegate to send ad life-cycle events to.
     /// It should be the one provided on `PartnerAdapter.makeAd(request:delegate:)`.
     weak var delegate: PartnerAdDelegate?
-    
+
+    /// The completion for the ongoing preload operation.
+    var preloadCompletion: ((Result<PartnerEventDetails, Error>) -> Void)?
+
     /// The completion for the ongoing load operation.
     var loadCompletion: ((Result<PartnerEventDetails, Error>) -> Void)?
 

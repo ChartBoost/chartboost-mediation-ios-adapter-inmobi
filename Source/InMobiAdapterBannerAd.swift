@@ -8,7 +8,7 @@ import Foundation
 import InMobiSDK
 
 /// The Chartboost Mediation InMobi adapter banner ad.
-final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
+final class InMobiAdapterBannerAd: InMobiAdapterAd, InMobiPreloadable, PartnerAd {
     
     /// The partner ad view to display inline. E.g. a banner view.
     /// Should be nil for full-screen ads.
@@ -16,7 +16,17 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
     
     /// InMobi's placement ID needed to create a IMBanner instance.
     private let placementID: Int64
-    
+
+    /// A banner ad.
+    private lazy var ad: IMBanner? = {
+        guard let size = fixedBannerSize(for: request.size ?? IABStandardAdSize) else {
+            return nil
+        }
+        let frame = CGRect(origin: .zero, size: size)
+        let ad = IMBanner(frame: frame, placementId: placementID, delegate: self)
+        return ad
+    }()
+
     override init(adapter: PartnerAdapter, request: PartnerAdLoadRequest, delegate: PartnerAdDelegate) throws {
         guard let placementID = Int64(request.partnerPlacement) else {
             throw adapter.error(.loadFailureInvalidPartnerPlacement, description: "Failed to cast placement to Int64")
@@ -24,7 +34,17 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
         self.placementID = placementID
         try super.init(adapter: adapter, request: request, delegate: delegate)
     }
-    
+
+    /// Requesting banner  ad for bid.
+    func preload(completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
+        guard let ad else {
+            let error = error(.loadFailureInvalidBannerSize)
+            return completion(.failure(error))
+        }
+        preloadCompletion = completion
+        ad.preloadManager.preload()
+    }
+
     /// Loads an ad.
     /// - parameter viewController: The view controller on which the ad will be presented on. Needed on load for some banners.
     /// - parameter completion: Closure to be performed once the ad has been loaded.
@@ -32,7 +52,7 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
         log(.loadStarted)
 
         // Fail if we cannot fit a fixed size banner in the requested size.
-        guard let size = fixedBannerSize(for: request.size ?? IABStandardAdSize) else {
+        guard let ad else {
             let error = error(.loadFailureInvalidBannerSize)
             log(.loadFailed(error))
             return completion(.failure(error))
@@ -42,8 +62,6 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
         loadCompletion = completion
         
         // Create the banner
-        let frame = CGRect(origin: .zero, size: size)
-        let ad = IMBanner(frame: frame, placementId: placementID, delegate: self)
         ad.shouldAutoRefresh(false)
         inlineView = ad
         
@@ -61,6 +79,17 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
 }
 
 extension InMobiAdapterBannerAd: IMBannerDelegate {
+
+    func banner(_ banner: IMBanner, didReceiveWithMetaInfo info: IMAdMetaInfo) {
+        let bidInfo = Dictionary(uniqueKeysWithValues: info.bidInfo.map { ($0, String(describing: $1)) })
+        preloadCompletion?(.success(bidInfo))
+        preloadCompletion = nil
+    }
+
+    func banner(_ banner: IMBanner, didFailToReceiveWithError error: IMRequestStatus) {
+        preloadCompletion?(.failure(error))
+        preloadCompletion = nil
+    }
 
     func bannerAdImpressed(_ banner: IMBanner) {
         log(.didTrackImpression)
