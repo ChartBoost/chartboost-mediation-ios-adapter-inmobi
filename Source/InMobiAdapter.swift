@@ -22,7 +22,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     let adapterVersion = "4.10.7.0.0"
     
     /// The partner's unique identifier.
-    let partnerIdentifier = "inmobi"
+    let partnerID = "inmobi"
     
     /// The human-friendly partner name.
     let partnerDisplayName = "InMobi"
@@ -36,13 +36,13 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// Does any setup needed before beginning to load ads.
     /// - parameter configuration: Configuration data for the adapter to set up.
     /// - parameter completion: Closure to be performed by the adapter when it's done setting up. It should include an error indicating the cause for failure or `nil` if the operation finished successfully.
-    func setUp(with configuration: PartnerConfiguration, completion: @escaping (Error?) -> Void) {
+    func setUp(with configuration: PartnerConfiguration, completion: @escaping (Result<PartnerDetails, Error>) -> Void) {
         log(.setUpStarted)
         // Get credentials, fail early if they are unavailable
         guard let accountID = configuration.accountID else {
             let error = error(.initializationFailureInvalidCredentials, description: "Missing \(String.accountIDKey)")
             log(.setUpFailed(error))
-            completion(error)
+            completion(.failure(error))
             return
         }
         // Initialize InMobi
@@ -52,10 +52,10 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             IMSdk.initWithAccountID(accountID) { [self] error in
                 if let error = error {
                     log(.setUpFailed(error))
-                    completion(error)
+                    completion(.failure(error))
                 } else {
                     log(.setUpSucceded)
-                    completion(nil)
+                    completion(.success([:]))
                 }
             }
         }
@@ -64,9 +64,10 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// Fetches bidding tokens needed for the partner to participate in an auction.
     /// - parameter request: Information about the ad load request.
     /// - parameter completion: Closure to be performed with the fetched info.
-    func fetchBidderInformation(request: PreBidRequest, completion: @escaping ([String : String]?) -> Void) {
+    func fetchBidderInformation(request: PartnerAdPreBidRequest, completion: @escaping (Result<[String : String], Error>) -> Void) {
         // InMobi does not currently provide any bidding token
-        completion(nil)
+        log(.fetchBidderInfoNotSupported)
+        completion(.success([:]))
     }
     
     /// Indicates if GDPR applies or not and the user's GDPR consent status.
@@ -113,17 +114,12 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     func makeAd(request: PartnerAdLoadRequest, delegate: PartnerAdDelegate) throws -> PartnerAd {
         // This partner supports multiple loads for the same partner placement.
         switch request.format {
-        case .interstitial, .rewarded:
+        case PartnerAdFormats.interstitial, PartnerAdFormats.rewarded:
             return try InMobiAdapterFullscreenAd(adapter: self, request: request, delegate: delegate)
-        case .banner:
+        case PartnerAdFormats.banner, PartnerAdFormats.adaptiveBanner:
             return try InMobiAdapterBannerAd(adapter: self, request: request, delegate: delegate)
         default:
-            // Not using the `.adaptiveBanner` case directly to maintain backward compatibility with Chartboost Mediation 4.0
-            if request.format.rawValue == "adaptive_banner" {
-                return try InMobiAdapterBannerAd(adapter: self, request: request, delegate: delegate)
-            } else {
-                throw error(.loadFailureUnsupportedAdFormat)
-            }
+            throw error(.loadFailureUnsupportedAdFormat)
         }
     }
     
