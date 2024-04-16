@@ -116,7 +116,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         switch request.format {
         case PartnerAdFormats.interstitial, PartnerAdFormats.rewarded:
             return try InMobiAdapterFullscreenAd(adapter: self, request: request, delegate: delegate)
-        case PartnerAdFormats.banner, PartnerAdFormats.adaptiveBanner:
+        case PartnerAdFormats.banner:
             return try InMobiAdapterBannerAd(adapter: self, request: request, delegate: delegate)
         default:
             throw error(.loadFailureUnsupportedAdFormat)
