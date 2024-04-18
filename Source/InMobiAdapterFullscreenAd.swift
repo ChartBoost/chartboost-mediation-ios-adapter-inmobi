@@ -8,16 +8,7 @@ import Foundation
 import InMobiSDK
 
 /// The Chartboost Mediation InMobi adapter fullscreen ad.
-final class InMobiAdapterFullscreenAd: InMobiAdapterAd, PartnerAd {
-    
-    /// The partner ad view to display inline. E.g. a banner view.
-    /// Should be nil for full-screen ads.
-    var inlineView: UIView? { nil }
-
-    /// The loaded partner ad banner size.
-    /// Should be `nil` for full-screen ads.
-    var bannerSize: PartnerBannerSize? { nil }
-
+final class InMobiAdapterFullscreenAd: InMobiAdapterAd, PartnerFullscreenAd {
     /// The InMobi ad instance.
     private let ad: IMInterstitial
     
