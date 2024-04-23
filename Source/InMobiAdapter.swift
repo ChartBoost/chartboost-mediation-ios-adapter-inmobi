@@ -9,30 +9,26 @@ import InMobiSDK
 
 /// The Chartboost Mediation InMobi adapter.
 final class InMobiAdapter: NSObject, PartnerAdapter {
-    /// This key for the TCFv2 string when stored in UserDefaults is defined by the IAB in Consent Management Platform API Final v.2.2 May 2023
-    /// https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#what-is-the-cmp-in-app-internal-structure-for-the-defined-api
-    private let tcfv2Key = "IABTCF_TCString"
-
     /// The version of the partner SDK.
     let partnerSDKVersion = IMSdk.getVersion()
-    
+
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
     /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
     let adapterVersion = "4.10.7.0.0"
-    
+
     /// The partner's unique identifier.
     let partnerID = "inmobi"
-    
+
     /// The human-friendly partner name.
     let partnerDisplayName = "InMobi"
-    
+
     /// The designated initializer for the adapter.
     /// Chartboost Mediation SDK will use this constructor to create instances of conforming types.
     /// - parameter storage: An object that exposes storage managed by the Chartboost Mediation SDK to the adapter.
     /// It includes a list of created `PartnerAd` instances. You may ignore this parameter if you don't need it.
     init(storage: PartnerAdapterStorage) {}
-    
+
     /// Does any setup needed before beginning to load ads.
     /// - parameter configuration: Configuration data for the adapter to set up.
     /// - parameter completion: Closure to be performed by the adapter when it's done setting up. It should include an error indicating the cause for failure or `nil` if the operation finished successfully.
@@ -60,7 +56,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             }
         }
     }
-    
+
     /// Fetches bidding tokens needed for the partner to participate in an auction.
     /// - parameter request: Information about the ad load request.
     /// - parameter completion: Closure to be performed with the fetched info.
@@ -69,39 +65,53 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         log(.fetchBidderInfoNotSupported)
         completion(.success([:]))
     }
-    
-    /// Indicates if GDPR applies or not and the user's GDPR consent status.
-    /// - parameter applies: `true` if GDPR applies, `false` if not, `nil` if the publisher has not provided this information.
-    /// - parameter status: One of the `GDPRConsentStatus` values depending on the user's preference.
-    func setGDPR(applies: Bool?, status: GDPRConsentStatus) {
+
+    /// Indicates that the user consent has changed.
+    /// - parameter consents: The new consents value, including both modified and unmodified consents.
+    /// - parameter modifiedKeys: A set containing all the keys that changed.
+    func setConsents(_ consents: [ConsentKey: ConsentValue], modifiedKeys: Set<ConsentKey>) {
+        guard modifiedKeys.contains(partnerID)
+                || modifiedKeys.contains(ConsentKeys.gdprConsentGiven)
+                || modifiedKeys.contains(ConsentKeys.tcf)
+        else {
+            return
+        }
         // See IMSdk.setPartnerGDPRConsent(_:) documentation on IMSdk.h
+
+        // GDPR Applies
         var value: [String: Any] = [:]
-        if let applies = applies {
-            value[IMCommonConstants.IM_PARTNER_GDPR_APPLIES] = applies ? String.gdprApplies : .gdprDoesNotApply
+        if let applies = UserDefaults.standard.string(forKey: .tcfGDPRApplies) {
+            // applies = "1", does not apply = "0"
+            // Both IAB and IMSdk use the same values with the same meaning, so it's a direct assignment
+            value[IMCommonConstants.IM_PARTNER_GDPR_APPLIES] = applies
         }
-        if status != .unknown {
-            value[IMCommonConstants.IM_PARTNER_GDPR_CONSENT_AVAILABLE] = status == .granted ? String.gdprConsentAvailable : .gdprConsentUnavailable
+
+        // GDPR consent
+        let consent = consents[partnerID] ?? consents[ConsentKeys.gdprConsentGiven]
+        switch consent {
+        case ConsentValues.granted:
+            value[IMCommonConstants.IM_PARTNER_GDPR_CONSENT_AVAILABLE] = String.gdprConsentAvailable
+        case ConsentValues.denied:
+            value[IMCommonConstants.IM_PARTNER_GDPR_CONSENT_AVAILABLE] = String.gdprConsentUnavailable
+        default:
+            break
         }
-        if let tcfString = UserDefaults.standard.string(forKey: tcfv2Key) {
+
+        // TCF string
+        if let tcfString = consents[ConsentKeys.tcf] {
             value[IMCommonConstants.IM_GDPR_CONSENT_IAB] = tcfString
         }
+
         IMSdk.setPartnerGDPRConsent(value)
         log(.privacyUpdated(setting: "partnerGDPRConsent", value: value))
     }
-    
-    /// Indicates the CCPA status both as a boolean and as an IAB US privacy string.
-    /// - parameter hasGivenConsent: A boolean indicating if the user has given consent.
-    /// - parameter privacyString: An IAB-compliant string indicating the CCPA status.
-    func setCCPA(hasGivenConsent: Bool, privacyString: String) {
-        // InMobi SDK does not provide CCPA APIs
-    }
-    
-    /// Indicates if the user is subject to COPPA or not.
-    /// - parameter isChildDirected: `true` if the user is subject to COPPA, `false` otherwise.
-    func setCOPPA(isChildDirected: Bool) {
+
+    /// Indicates that the user is underage signal has changed.
+    /// - parameter isUserUnderage: `true` if the user is underage as determined by the publisher, `false` otherwise.
+    func setIsUserUnderage(_ isUserUnderage: Bool) {
         // See https://support.inmobi.com/monetize/sdk-documentation/ios-guidelines/overview-ios-guidelines#optimizing-data
-        IMSdk.setIsAgeRestricted(isChildDirected)
-        log(.privacyUpdated(setting: "isAgeRestricted", value: isChildDirected))
+        IMSdk.setIsAgeRestricted(isUserUnderage)
+        log(.privacyUpdated(setting: "isAgeRestricted", value: isUserUnderage))
     }
     
     /// Creates a new banner ad object in charge of communicating with a single partner SDK ad instance.
@@ -190,12 +200,11 @@ private extension PartnerConfiguration {
 private extension String {
     /// InMobi account ID credentials key
     static let accountIDKey = "account_id"
-    /// InMobi GDPR applies value. Defined in IMSdk.h comments.
-    static let gdprApplies = "1"
-    /// InMobi GDPR does not apply value. Defined in IMSdk.h comments.
-    static let gdprDoesNotApply = "0"
     /// InMobi GDPR available consent value. Defined in IMSdk.h comments.
     static let gdprConsentAvailable = "true"
     /// InMobi GDPR unavailable consent value. Defined in IMSdk.h comments.
     static let gdprConsentUnavailable = "false"
+    /// This key for the TCFv2 string when stored in UserDefaults is defined by the IAB in Consent Management Platform API Final v.2.2 May 2023
+    /// https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#what-is-the-cmp-in-app-internal-structure-for-the-defined-api
+    static let tcfGDPRApplies = "IABTCF_gdprApplies"
 }
