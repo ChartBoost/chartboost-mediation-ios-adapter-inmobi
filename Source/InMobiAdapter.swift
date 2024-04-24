@@ -41,6 +41,11 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
             completion(.failure(error))
             return
         }
+
+        // Apply initial consents
+        setConsents(configuration.consents, modifiedKeys: Set(configuration.consents.keys))
+        setIsUserUnderage(configuration.isUserUnderage)
+
         // Initialize InMobi
         // It's necessary to call `initWithAccountID` on the main thread because it appears to
         // occasionally use WebKit APIs that must be accessed on the main thread.
