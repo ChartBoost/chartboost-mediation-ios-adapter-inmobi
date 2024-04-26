@@ -10,18 +10,26 @@ import InMobiSDK
 /// The Chartboost Mediation InMobi adapter.
 final class InMobiAdapter: NSObject, PartnerAdapter {
     /// The version of the partner SDK.
-    let partnerSDKVersion = IMSdk.getVersion()
+    var partnerSDKVersion: String {
+        InMobiAdapterConfiguration.partnerSDKVersion
+    }
 
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
     /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
-    let adapterVersion = "4.10.7.0.0"
+    var adapterVersion: String {
+        InMobiAdapterConfiguration.adapterVersion
+    }
 
     /// The partner's unique identifier.
-    let partnerID = "inmobi"
+    var partnerID: String {
+        InMobiAdapterConfiguration.partnerID
+    }
 
     /// The human-friendly partner name.
-    let partnerDisplayName = "InMobi"
+    var partnerDisplayName: String {
+        InMobiAdapterConfiguration.partnerDisplayName
+    }
 
     /// The designated initializer for the adapter.
     /// Chartboost Mediation SDK will use this constructor to create instances of conforming types.
