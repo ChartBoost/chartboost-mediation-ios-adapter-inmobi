@@ -10,17 +10,6 @@ import InMobiSDK
 /// The Chartboost Mediation InMobi adapter.
 final class InMobiAdapter: NSObject, PartnerAdapter {
 
-    /// Specialized error cases for the InMobi adapter.
-    enum InMobiAdapterError: LocalizedError {
-        case failedToProvideBidToken
-
-        var errorDescription: String? {
-            switch self {
-            case .failedToProvideBidToken: return "Failed to provide bid token."
-            }
-        }
-    }
-
     /// This key for the TCFv2 string when stored in UserDefaults is defined by the IAB in Consent Management Platform API Final v.2.2 May 2023
     /// https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#what-is-the-cmp-in-app-internal-structure-for-the-defined-api
     private let tcfv2Key = "IABTCF_TCString"
@@ -79,7 +68,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     func fetchBidderInformation(request: PreBidRequest, completion: @escaping ([String : String]?) -> Void) {
         log(.fetchBidderInfoStarted(request))
         guard let bidToken = IMSdk.getToken() else {
-            log(.fetchBidderInfoFailed(request, error: InMobiAdapterError.failedToProvideBidToken))
+            log(.fetchBidderInfoFailed(request, error: error(.prebidFailureUnknown, description: "Failed to provide bid token.")))
             return
         }
         log(.fetchBidderInfoSucceeded(request))
