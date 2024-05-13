@@ -69,6 +69,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
         log(.fetchBidderInfoStarted(request))
         guard let bidToken = IMSdk.getToken() else {
             log(.fetchBidderInfoFailed(request, error: error(.prebidFailureUnknown, description: "Failed to provide bid token.")))
+            completion(nil)
             return
         }
         log(.fetchBidderInfoSucceeded(request))
