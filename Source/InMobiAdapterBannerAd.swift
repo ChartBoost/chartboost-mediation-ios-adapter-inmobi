@@ -48,7 +48,11 @@ final class InMobiAdapterBannerAd: InMobiAdapterAd, PartnerAd {
         inlineView = ad
         
         // Load it
-        ad.load()
+        if let adm = request.adm, let data = adm.data(using: .utf8) {
+            ad.load(data)
+        } else {
+            ad.load()
+        }
     }
     
     /// Shows a loaded ad.

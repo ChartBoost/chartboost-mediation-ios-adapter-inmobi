@@ -9,7 +9,7 @@ import InMobiSDK
 
 /// The Chartboost Mediation InMobi adapter fullscreen ad.
 final class InMobiAdapterFullscreenAd: InMobiAdapterAd, PartnerAd {
-    
+
     /// The partner ad view to display inline. E.g. a banner view.
     /// Should be nil for full-screen ads.
     var inlineView: UIView? { nil }
@@ -34,7 +34,11 @@ final class InMobiAdapterFullscreenAd: InMobiAdapterAd, PartnerAd {
     func load(with viewController: UIViewController?, completion: @escaping (Result<PartnerEventDetails, Error>) -> Void) {
         log(.loadStarted)
         loadCompletion = completion
-        ad.load()
+        if let adm = request.adm, let data = adm.data(using: .utf8) {
+            ad.load(data)
+        } else {
+            ad.load()
+        }
     }
     
     /// Shows a loaded ad.
