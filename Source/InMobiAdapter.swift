@@ -67,7 +67,8 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// - parameter completion: Closure to be performed with the fetched info.
     func fetchBidderInformation(request: PreBidRequest, completion: @escaping ([String : String]?) -> Void) {
         log(.fetchBidderInfoStarted(request))
-        guard let bidToken = IMSdk.getToken() else {
+        let extras = ["tp": "c_chartboost", "tp-ver": Helium.sdkVersion]
+        guard let bidToken = IMSdk.getTokenWithExtras(extras, andKeywords: nil) else {
             log(.fetchBidderInfoFailed(request, error: error(.prebidFailureUnknown, description: "Failed to provide bid token.")))
             completion(nil)
             return
