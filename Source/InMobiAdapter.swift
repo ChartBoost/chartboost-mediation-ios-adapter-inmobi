@@ -68,8 +68,6 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     func fetchBidderInformation(request: PreBidRequest, completion: @escaping ([String : String]?) -> Void) {
         log(.fetchBidderInfoStarted(request))
         let extras = ["tp": "c_chartboost", "tp-ver": Helium.sdkVersion]
-        // The `andKeywords` parameter is type `String?` so we're not passing it `request.keywords`.
-        // TBD whether it would be helpful to flatten our `[String: String]` keywords and send that.
         guard let bidToken = IMSdk.getTokenWithExtras(extras, andKeywords: nil) else {
             log(.fetchBidderInfoFailed(request, error: error(.prebidFailureUnknown, description: "Failed to provide bid token.")))
             completion(nil)
