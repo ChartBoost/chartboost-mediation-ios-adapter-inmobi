@@ -20,7 +20,7 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// The version of the adapter.
     /// It should have either 5 or 6 digits separated by periods, where the first digit is Chartboost Mediation SDK's major version, the last digit is the adapter's build version, and intermediate digits are the partner SDK's version.
     /// Format: `<Chartboost Mediation major version>.<Partner major version>.<Partner minor version>.<Partner patch version>.<Partner build version>.<Adapter build version>` where `.<Partner build version>` is optional.
-    let adapterVersion = "4.10.7.0.1"
+    let adapterVersion = "4.10.7.0.2"
     
     /// The partner's unique identifier.
     let partnerIdentifier = "inmobi"
@@ -67,7 +67,8 @@ final class InMobiAdapter: NSObject, PartnerAdapter {
     /// - parameter completion: Closure to be performed with the fetched info.
     func fetchBidderInformation(request: PreBidRequest, completion: @escaping ([String : String]?) -> Void) {
         log(.fetchBidderInfoStarted(request))
-        guard let bidToken = IMSdk.getToken() else {
+        let extras = ["tp": "c_chartboost", "tp-ver": Helium.sdkVersion]
+        guard let bidToken = IMSdk.getTokenWithExtras(extras, andKeywords: nil) else {
             log(.fetchBidderInfoFailed(request, error: error(.prebidFailureUnknown, description: "Failed to provide bid token.")))
             completion(nil)
             return
