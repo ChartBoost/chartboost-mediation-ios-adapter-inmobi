@@ -1,12 +1,25 @@
-## Changelog
+# Changelog
 
 Note the first digit of every adapter version corresponds to the major version of the Chartboost Mediation SDK compatible with that adapter. 
 Adapters are compatible with any Chartboost Mediation SDK version within that major version.
+
+All official releases can be found on this repository's [releases page](https://github.com/ChartBoost/chartboost-mediation-ios-adapter-inmobi/releases).
+
+## Table of Contents
+- [Mediation 5](#mediation-5)
+- [Mediation 4](#mediation-4)
+
+## Mediation 5
+
+### 5.10.8.0.0
+- This version of the adapter has been certified with InMobiSDK 10.8.0.
 
 ### 5.10.7.0.0
 - The minimum deployment target compatible with this adapter is now iOS 13.
 - This version of the adapter has been certified with ChartboostMediationSDK 5.0.0.
 - This version of the adapter has been certified with InMobiSDK 10.7.0.
+
+## Mediation 4
 
 ### 4.10.7.0.2
 - Add Chartboost-specific extras to bidding token.
