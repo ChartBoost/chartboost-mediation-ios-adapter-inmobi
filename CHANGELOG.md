@@ -11,6 +11,9 @@ All official releases can be found on this repository's [releases page](https://
 
 ## Mediation 5
 
+### 5.11.3.0.0
+- This version of the adapter has been certified with InMobiSDK 11.3.0.
+
 ### 5.11.2.0.0
 - This version of the adapter has been certified with InMobiSDK 11.2.0.
 
